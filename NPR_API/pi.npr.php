@@ -1090,25 +1090,20 @@ class Npr
     {
         ob_start(); 
 ?>
-<p>
 This is a standard plugin for ExpressionEngine 1.6.x content management system.
 It has not been tested under ExpressionEngine 2.x at all. Use with
 ExpressionEngine 2.x is NOT RECOMMENDED. Installation is according to the
 plugin installation instructions in the ExpressionEngine User Guide:
 [Using Plugins] (http://expressionengine.com/legacy_docs/templates/plugins.html).
-</p>
-<p>
+
 Once installed, this plugin provides three additional template tags:
-</p>
-<ul>
-<li>{exp:npr:query}</li>
-<li>{exp:npr:station}</li>
-<li>{exp:npr:transcript}</li>
-</ul>
-<p>
+
+* {exp:npr:query}
+* {exp:npr:station}
+* {exp:npr:transcript}
+
 These tags correspond to the three functions of the same names provided by the
 NPR API.
-</p>
 <?php
         $buffer = ob_get_contents();        
         ob_end_clean(); 

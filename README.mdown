@@ -1,10 +1,10 @@
-# ideastream&reg Open Source Projects
+# ideastream(r) Open Source Projects
 
-* *NPR_API:* An ExpressionEngine 1.6.x plugin for accessing the NPR API.
+* **NPR_API:** An ExpressionEngine 1.6.x plugin for accessing the NPR API.
 
 ## License
 
-Copyright &copy ideastream&reg -- released under the [MIT license](http://www.opensource.org/licenses/mit-license.php).
+Copyright (c) ideastream(r) -- released under the [MIT license](http://www.opensource.org/licenses/mit-license.php).
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
