@@ -1,0 +1,215 @@
+# ideastream(r) NPR API
+**Plugin for ExpressionEngine**
+
+This is a plugin for ExpressionEngin 1.6.x that is used to send requests to
+the NPR API and then process the results using normal ExpressionEngine
+template syntax. Use of this plugin requires a key to the NPR API. Keys are
+normally reserved for NPR affiliate radio stations and other partners.
+
+For more information see the following resources:
+
+* [ideastream](http://www.ideastream.org/) 
+* [NPR API](http://www.npr.org/api/index.php)
+* [ExpressionEngine](http://expressionengine.com/)
+
+## Usage
+
+This is a standard plugin for ExpressionEngine 1.6.x content management system.
+It has not been tested under ExpressionEngine 2.x at all. Use with
+ExpressionEngine 2.x is NOT RECOMMENDED. Installation is according to the
+plugin installation instructions in the ExpressionEngine User Guide:
+[Using Plugins] (http://expressionengine.com/legacy_docs/templates/plugins.html).
+
+Once installed, this plugin provides three additional template tags:
+
+* {exp:npr:query}
+* {exp:npr:station}
+* {exp:npr:transcript}
+
+These tags correspond to the three functions of the same names provided by the
+NPR API.
+
+### Query
+
+Send a Query request to the NPR API and process the results.
+
+Input parameters are pulled from the ExpressionEngine tag attributes. All
+API options are valid as tag attributes excelt the 'output' option. There
+are also a few plugin-specific options available. Refer to the NPR API
+documentation for complete details. A few of the most notable options are
+detailed here.
+
+Most, but not all, of the output data from the NPR API is accessible
+within the tag body. Most, but not all, support conditional checks using
+the 'if' tag. Some of the data elements are accessed through single tags
+but some require nesting within a tag pair. Most of the data elements
+within the tag pairs also support conditional processing with the 'if'
+tag. See the sample tag below for an example of use.
+
+The NPR API does support field filtering through the query itself. This
+tag supports this as well using the requested field values as tag
+attributes. For most queries it is not necessary to filter output fields
+in the request since ExpressionEngine template processing can be used to
+filter the final output. Limiting the number of fields returned by the
+query will reduce the amount of data transferred and may have an
+appreciable effect on performace for larger sites, but query caching may
+have a greater impact.
+
+ExpressionEngine supports explicit cachine of tag output for any tag.
+Including the 'cache' and 'refresh' attributes (see below) in the opening
+tag and setting the appropriate values will instruct ExpressionEngine to
+cache the output of the tag processing for a specified time. It is highly
+recommended that caching be used for most queries since the data returned
+by NPR is unlilely to change more than once every several minutes and
+even an hour of caching is unlikely to be noticed by the reader. Caching
+judiciously will improve the performace of the ExpressionEngine web site
+and will also reduce the load on the NPR API.
+
+The special tag variable 'dump' is provided for use within the template
+tag for debugging purposes. Dump is a single variable that will dump
+the raw output of the query into the HTML output formatted as a PHP
+array. This should not be done in production, only testing.
+
+* **apiKey** Stations must register with NPR for an API key. The NPR will not
+  respond to requests without a valid key. This field is required.
+
+* **output** The output option for normal queries is not supported. Query output
+  is limited to the template processing.
+
+* **cache** When set to 'yes' this will cause ExpressionEngine to cache
+  the output of the template tag processing and use the cached result
+  for future page loads. This only works in conjunction with the
+  'refresh' tag parameter. See the ExpressionEngine documentation for
+  more detail.
+* **refresh** Specifies the number of minutes the cache should be
+  retained before a new API request is generated. Only works when the
+  'cache' parameter is used and set to 'yes' to enable caching. See
+  the ExpressionEngine documentation for more detail.
+
+---
+
+	{exp:npr:query id="5" startDate="2010-08-11 endDate="2010-08-18" fields="all" numResults="30" apiKey="demo" cache="yes" refresh="60"}
+	
+	<!--
+	{dump}
+	-->
+	
+	<h2>{title}</h2>
+	
+	<ul>
+	<li><strong>ID:</strong> {id}</li>
+	{if title}<li><strong>Title:</strong> {title}</li>{/if}
+	{if subtitle}<li><strong>Subtitle:</strong> {subtitle}</li>{/if}
+	{if shortTitle}<li><strong>Short Title:</strong> {shortTitle}</li>{/if}
+	{if teaser}<li><strong>Teaser:</strong> {teaser}</li>{/if}
+	{if miniTeaser}<li><strong>Mini Teaser:</strong> {miniTeaser}</li>{/if}
+	{if slug}<li><strong>Slug:</strong> {slug}</li>{/if}
+	{if link}<li><strong>Link:</strong> <a href="{link}">{link}</a></li>{/if}
+	{if link}<li><strong>HTML Link:</strong> <a href="{link type="html"}">{link type="html"}</a></li>{/if}
+	{if link}<li><strong>API Link:</strong> <a href="{link type="api"}">{link type="api"}</li></a>{/if}
+	{if link}<li><strong>Short Link:</strong> <a href="{link type="short"}">{link type="short"}</li></a>{/if}
+	{if storyDate}<li><strong>Story Date:</strong> {storyDate format="%F %d %Y"}</li>{/if}
+	{if pubDate}<li><strong>Publication Date:</strong> {pubDate format="%F %d %Y"}</li>{/if}
+	{if lastModifiedDate}<li><strong>Modification Date:</strong> {lastModifiedDate}</li>{/if}
+	{if transcript}<li><strong>Transcript:</strong> {transcript}</li>{/if}
+	</ul>
+	
+	{if audio}
+	  <h3>Audio:</h3>
+	  <ul>
+	  {audio}
+	    {if id}<li><strong>ID:</strong> {id}</li>{/if}
+	    {if type}<li><strong>Type:</strong> {type}</li>{/if}
+	    {if title}<li><strong>Title:</strong> {title}</li>{/if}
+	    {if duration}<li><strong>Duration:</strong> {duration}</li>{/if}
+	    {if description}<li><strong>Description:</strong> {description}</li>{/if}
+	    {if rightsHolder}<li><strong>Rights Holder:</strong> {rightsHolder}</li>{/if}
+	    {if format}<li><strong>Link:</strong> <a href="{format}">{format}</a></li>{/if}
+	    {if format}<li><strong>MP3 Link:</strong> <a href="{format mp3}">{format mp3}</a></li>{/if}
+	    {if format}<li><strong>WM Link:</strong> <a href="{format wm}">{format wm}</a></li>{/if}
+	    {if format}<li><strong>RM Link:</strong> <a href="{format rm}">{format rm}</a></li>{/if}
+	  {/audio}
+	  </ul>
+	{/if}
+	
+	{if image}
+	  <h3>Images: </h3>
+	  <ul>
+	  {image}
+	    {if id}<li><strong>ID:</strong> {id}</li>{/if}
+	    {if type}<li><strong>Type:</strong> {type}</li>{/if}
+	    {if width}<li><strong>Width:</strong> {width}</li>{/if}
+	    {if src}<li><strong>Source:</strong> {src}</li>{/if}
+	    {if hasBorder}<li><strong>Has Border:</strong> {hasBorder}</li>{/if}
+	    {if title}<li><strong>Title:</strong> {title}</li>{/if}
+	    {if caption}<li><strong>Caption:</strong> {caption}</li>{/if}
+	    {if producer}<li><strong>Producer:</strong> {producer}</li>{/if}
+	    {if copyright}<li><strong>Copyright:</strong> {copyright}</li>{/if}
+	    {if link}<li><strong>Link:</strong> {link}</li>{/if}
+	    {if provider}<li><strong>Provider:</strong> {provider}</li>{/if}
+	    {if enlargement}<li><strong>Enlargement:</strong> {enlargement}</li>{/if}
+	  {/image}
+	  </ul>
+	
+	  {image}
+	    {if src}<p><img src="{src}" {if width}width="{width}"{/if} />{/if}
+	    <br />
+	    {if enlargement}<p><img src="{enlargement}" />{/if}
+	  {/image}
+	
+	{/if}
+	
+	{if thumbnail}
+	  <h3>Thumbnails:</h3>
+	  <p>
+	  <img src="{thumbnail}" />
+	  <img src="{thumbnail size="medium"}" />
+	  <img src="{thumbnail size="large"}" />
+	  </p>
+	{/if}
+	
+	{if toenail}
+	  <h3>Toenails:</h3>
+	  <p>
+	  <img src="{toenail}" />
+	  <img src="{toenail size="medium"}" />
+	  <img src="{toenail size="large"}" />
+	  </p>
+	{/if}
+	
+	{if textWithHtml}
+	  <h3>Text:</h3>
+	  {textWithHtml}
+	{/if}
+	
+	{/exp:npr:query}
+
+### Station
+
+*Not Yet Implemented*
+
+### Transcript
+
+*Not Yet Implemented*
+
+## License
+
+Copyright (c) ideastream(r) -- released under the [MIT license](http://www.opensource.org/licenses/mit-license.php).
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
