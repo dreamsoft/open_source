@@ -272,27 +272,31 @@ class Npr
         $this->return_data = '';
 
         // send the request
-        $data = json_decode($this->send_api_request(self::API_QUERY), true);
+        $raw = $this->send_api_request(self::API_QUERY);
+        $data = json_decode($raw, true);
 
         // loop through the set of stories
-        foreach ($data['list']['story'] as $story)
+        if (is_array($data))
         {
-            $tagdata = $this->_TMPL->tagdata;
-
-            // for each story, loop through the set of variable pairs
-            foreach ($this->_TMPL->var_pair as $var => $opts)
+            foreach ($data['list']['story'] as $story)
             {
-                $tagdata = $this->process_story_var_pairs($story, $var, $opts, $tagdata);
-            }
+                $tagdata = $this->_TMPL->tagdata;
 
-            // for each story, loop through the set of single vars
-            foreach ($this->_TMPL->var_single as $var => $opts)
-            {
-                $tagdata = $this->process_story_var_singles($story, $var, $opts, $tagdata);
-            }
+                // for each story, loop through the set of variable pairs
+                foreach ($this->_TMPL->var_pair as $var => $opts)
+                {
+                    $tagdata = $this->process_story_var_pairs($story, $var, $opts, $tagdata);
+                }
 
-            // append this story to the output buffer
-            $this->return_data .= $tagdata;
+                // for each story, loop through the set of single vars
+                foreach ($this->_TMPL->var_single as $var => $opts)
+                {
+                    $tagdata = $this->process_story_var_singles($story, $var, $opts, $tagdata);
+                }
+
+                // append this story to the output buffer
+                $this->return_data .= $tagdata;
+            }
         }
 
         // return the processed results
