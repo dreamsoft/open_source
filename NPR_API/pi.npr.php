@@ -163,7 +163,7 @@ class Npr
      * @link http://www.npr.org/api/queryGenerator.php 
      * @link http://expressionengine.com/legacy_docs/general/caching.html#tag_caching 
      * 
-     * {exp:npr:query id="5" startDate="2010-08-11 endDate="2010-08-18" fields="all" numResults="30" apiKey="demo" cache="yes" refresh="60"}
+     * {exp:npr:query id="5" startDate="2010-08-11" endDate="2010-08-18" fields="all" numResults="30" apiKey="demo" cache="yes" refresh="60"}
      * 
      * <!--
      * {dump}
@@ -264,7 +264,6 @@ class Npr
      * - organization
      * - parent
      * - byline
-     *
      **/
     public function query()
     {
@@ -278,9 +277,13 @@ class Npr
         // loop through the set of stories
         if (is_array($data))
         {
+            $count = 1;
             foreach ($data['list']['story'] as $story)
             {
                 $tagdata = $this->_TMPL->tagdata;
+
+                // process the story count conditional
+                $tagdata = $this->_FNS->prep_conditionals($tagdata, array('count' => $count++));
 
                 // for each story, loop through the set of variable pairs
                 foreach ($this->_TMPL->var_pair as $var => $opts)
@@ -479,10 +482,19 @@ class Npr
         // process 'if' statements
         $tagdata = $this->_FNS->prep_conditionals($tagdata, array('image' => TRUE));
 
+        // set the loop limit, check for the limit tag attribute
+        $count = count($story['image']);
+        if (is_array($opts) && array_key_exists('limit', $opts)) {
+            $limit = intval($opts['limit']);
+            if ($limit != 0 && $limit < $count) $count = $limit;
+        }
+
         // loop through all images attached to story
         $imagedata = '';
-        foreach ($story['image'] as $image)
+        for ($i = 0; $i < $count; $i++)
         {
+            $image = $story['image'][$i];
+
             // grab the body of the tag pair
             $tdata = $match[2];
             
